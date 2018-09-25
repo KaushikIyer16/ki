@@ -15,6 +15,7 @@ import javax.lang.model.element.*;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.*;
 
@@ -44,7 +45,7 @@ public class KiProcessor extends AbstractProcessor {
         String packageName = "";
         for (Element element: roundEnv.getElementsAnnotatedWith(Ki.class) ) {
 
-            packageName = ElementUtil.getPackageNameFromAnnotatedField(element);
+            packageName = ElementUtil.getPackageNameFromAnnotatedField(processingEnv, element);
             printMessage(Diagnostic.Kind.NOTE, "package name is "+packageName);
 
             String descriptionJson = element.getAnnotation(Ki.class).value();
@@ -67,10 +68,14 @@ public class KiProcessor extends AbstractProcessor {
                     FieldSpec.Builder memberFieldBuilder = FieldSpec.builder(fieldMemberType, member.get("name").toString())
                             .addModifiers(Modifier.PRIVATE);
 
-                    /* check if the member has got an alias field*/
+                    /* check if the member has got an alias/attributes field*/
                     if(member.keySet().contains("alias")){
                         injectAliasIntoField(memberFieldBuilder, member.get("alias").toString());
                     }
+                    if (member.keySet().contains("attributes")) {
+                        injectAttributesIntoField(memberFieldBuilder, (ArrayList<String>) member.get("attributes"));
+                    }
+
                     kiTypeSpecBuilder.addField(memberFieldBuilder.build());
 
                     /* generate getters and setters for each and every field */
@@ -129,6 +134,14 @@ public class KiProcessor extends AbstractProcessor {
         builder.addAnnotation(AnnotationSpec.builder(JsonProperty.class)
                 .addMember("value", "$S", alias)
                 .build());
+    }
+
+    private void injectAttributesIntoField(FieldSpec.Builder builder, ArrayList<String> attributes) {
+        printMessage(Diagnostic.Kind.NOTE, "the attributes field are " + attributes.get(0));
+
+        if (attributes.stream().anyMatch(attribute -> attribute.equalsIgnoreCase("NotNull"))) {
+            builder.addAnnotation(NotNull.class);
+        }
     }
 
     private List<Map<String, Object>> obtainMemberDetails(String descriptionJson) throws IOException {

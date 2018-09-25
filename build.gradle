@@ -1,11 +1,82 @@
-group 'com.knsi'
-version '1.0'
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
+    }
+}
 
-apply plugin: 'java'
+plugins {
+    id "com.jfrog.bintray" version "1.8.4"
+}
 
 repositories {
     mavenCentral()
 }
+group 'com.knsi'
+version '1.0.1'
+
+apply plugin: 'java'
+
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "kaushikiyer16"
+            name "Kaushik Iyer"
+            email "kaushiiyer@gmail.com"
+        }
+    }
+
+    scm {
+        url "https://github.com/KaushikIyer16/ki"
+    }
+}
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            groupId 'com.knsi'
+            artifactId 'ki'
+            version this.version
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'a java library to reduce pojo clustering and generate them during build time')
+                root.appendNode('name', 'ki')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+apply plugin: 'com.jfrog.bintray'
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
@@ -14,9 +85,14 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-core:2.9.6'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.6'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
+    compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.1'
+    compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+
+
 }
 
 task listJars << {
+    println project.name
     configurations.compile.each { File file -> println file.name }
 }
 
@@ -25,5 +101,21 @@ jar{
         configurations.compile.collect { it.isDirectory() ? it: zipTree(it)}
     }
     baseName = 'ki'
+}
+
+bintray {
+    user = 'kaushikiyer16'
+    key = '97d2249969f7c2768fc01a09a669cc6fe5d287f7'
+    publications = ['MyPublication']
+    pkg {
+        repo = 'Ki'
+        name = 'ki'
+        userOrg = 'kaushikiyer16'
+        licenses = ['Apache-2.0']
+        version {
+            name = '1.0'
+        }
+    }
+
 }
 

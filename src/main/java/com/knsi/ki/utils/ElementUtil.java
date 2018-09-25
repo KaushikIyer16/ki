@@ -9,8 +9,8 @@ import java.util.Map;
  * Created by kaushiknsiyer on 09/09/18.
  */
 public class ElementUtil {
-    public static String getPackageNameFromAnnotatedField(Element element){
-        return element.getEnclosingElement().getEnclosingElement().toString();
+    public static String getPackageNameFromAnnotatedField(ProcessingEnvironment processingEnv, Element element){
+        return processingEnv.getElementUtils().getPackageOf(element).toString();
     }
     public static String getClassNameFromAnnotatedField(Element element){
         return element.getSimpleName().toString();
