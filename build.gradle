@@ -15,7 +15,7 @@ repositories {
     mavenCentral()
 }
 group 'com.knsi'
-version '1.0.1'
+version '1.0.2'
 
 apply plugin: 'java'
 
@@ -87,7 +87,7 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
     compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.1'
     compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
-
+    compile group: 'com.google.auto.service', name: 'auto-service', version: '1.0-rc2'
 
 }
 

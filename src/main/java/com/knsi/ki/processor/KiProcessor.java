@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.google.auto.service.AutoService;
 import com.knsi.ki.interfaces.Ki;
 import com.knsi.ki.interfaces.Strategy;
 import com.knsi.ki.utils.ElementUtil;
@@ -22,6 +23,8 @@ import java.util.*;
 /**
  * Created by kaushiknsiyer on 23/08/18.
  */
+
+@AutoService(Processor.class)
 @SupportedAnnotationTypes({
     "com.knsi.ki.interfaces.Ki"
 })
