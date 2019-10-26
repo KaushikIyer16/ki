@@ -48,14 +48,6 @@ public class EnforceArgsProcessor extends AbstractProcessor {
                         .filter(this::doesNotHaveNoArgsConstructor)
                         .forEach(executableElement -> printMessage(Diagnostic.Kind.ERROR, "a default constructor is not present")));
 
-//        for (TypeElement typeElement : ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(EnforceNoArgsConstructor.class))) {
-//            for (ExecutableElement executableElement: ElementFilter.constructorsIn(typeElement.getEnclosedElements())) {
-//                if (!doesHaveNoArgsConstructor(executableElement)) {
-//                    printMessage(Diagnostic.Kind.ERROR, "a default constructor is not present");
-//                }
-//            }
-//        }
-
         return true;
     }
 }
