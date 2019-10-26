@@ -35,20 +35,26 @@ public class EnforceArgsProcessor extends AbstractProcessor {
         return SourceVersion.latestSupported();
     }
 
-    private boolean doesHaveNoArgsConstructor(ExecutableElement constructor) {
-        return constructor.getParameters().isEmpty();
+    private boolean doesNotHaveNoArgsConstructor(ExecutableElement constructor) {
+        return !constructor.getParameters().isEmpty();
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 
-        for (TypeElement typeElement : ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(EnforceNoArgsConstructor.class))) {
-            for (ExecutableElement executableElement: ElementFilter.constructorsIn(typeElement.getEnclosedElements())) {
-                if (!doesHaveNoArgsConstructor(executableElement)) {
-                    printMessage(Diagnostic.Kind.ERROR, "a default constructor is not present");
-                }
-            }
-        }
+        ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(EnforceNoArgsConstructor.class))
+                .forEach(typeElement -> ElementFilter.constructorsIn(typeElement.getEnclosedElements())
+                        .stream()
+                        .filter(this::doesNotHaveNoArgsConstructor)
+                        .forEach(executableElement -> printMessage(Diagnostic.Kind.ERROR, "a default constructor is not present")));
+
+//        for (TypeElement typeElement : ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(EnforceNoArgsConstructor.class))) {
+//            for (ExecutableElement executableElement: ElementFilter.constructorsIn(typeElement.getEnclosedElements())) {
+//                if (!doesHaveNoArgsConstructor(executableElement)) {
+//                    printMessage(Diagnostic.Kind.ERROR, "a default constructor is not present");
+//                }
+//            }
+//        }
 
         return true;
     }
